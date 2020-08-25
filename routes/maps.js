@@ -1,31 +1,30 @@
 const express = require('express');
 const router = express.Router();
 const config = require('../config.json');
-const fetchUrl = require("fetch").fetchUrl
+const fetchUrl = require("fetch").fetchUrl;
+const { Octokit } = require("@octokit/core");
+const octokit = new Octokit({ auth: `${process.env.githubuserapitoken}` });
 
-router.get('/', (req, res, next) => {
+router.get('/', async(req, res, next)  => {
   res.send('Working on page still, GitHub API go bruh.');
 
-  fetchUrl("https://api.github.com/repos/craftingforchrist/Maps/contributors", function (error, meta, body) {
-    headers: {
-      Authorization: `token ${process.env.githubuserapitoken}`
-    }
-
-    console.log(`\n\n${body}\n\n\n\n${error}`);
+  const response = await octokit.request('GET /repos/{owner}/{repo}/contents/TDM?{ref}', {
+    owner: 'craftingforchrist',
+    repo: 'Maps',
+    ref: 'master'
   });
 
-  // const url = 'https://api.github.com/repos/craftingforchrist/Maps'
-  // const headers = {
-  //   Authorization: `token ${process.env.githubuserapitoken}`
-  // }
-  // const response = fetchUrl(url, {
-  //   "method": "GET",
-  //   "headers": headers
-  // });
-  // const result = response.json();
-  //
-  // console.log(result);
+  const resdata = response.data;
+  var i;
+  for (i = 0; i < resdata.length; i++) {
+    console.log(
+      `${resdata[i].name}\n${resdata[i].url}`
+    );
 
+    console.log(`\n\n`);
+
+    
+  }
 });
 
 module.exports = router;
